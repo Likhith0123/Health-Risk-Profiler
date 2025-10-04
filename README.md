@@ -137,7 +137,7 @@ Value: Select your survey image file.
 
 Example curl command:
 
-curl -X POST -F "surveyImage=@OCR_PROCESSING/sample_image.png" http://localhost:3000/analyze
+curl -X POST -F "surveyImage=@OCR_PROCESSOR/sample_image.png" http://localhost:3000/analyze
 
 Option B: Analyze Raw JSON Data
 Use this method to send survey data directly as a JSON object, bypassing the OCR step.
