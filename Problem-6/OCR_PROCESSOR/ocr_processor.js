@@ -1,4 +1,3 @@
-
 const Tesseract = require('tesseract.js');
 const Jimp = require('jimp');
 const path = require('path');
@@ -8,7 +7,7 @@ const path = require('path');
  * @param {string} imagePath - The path to the image file.
  * @returns {Promise<Buffer>} - A buffer of the processed image.
  */
-async function _preprocessForOcr(imagePath) {
+async function _preprocessImage(imagePath) {
     const image = await Jimp.read(imagePath);
     
     // Upscale, convert to grayscale, and apply contrast
@@ -25,7 +24,7 @@ async function _preprocessForOcr(imagePath) {
  * @param {string} text - The raw text from Tesseract.
  * @returns {object} - The structured survey data.
  */
-function _parseTextToObject(text) {
+function _parseOcrText(text) {
     const parsedData = {};
     const patterns = {
         age: /(?:age|years)\s*:\s*(\d+)/i,
@@ -35,7 +34,7 @@ function _parseTextToObject(text) {
         diet: /diet\s*:\s*(.*)/i,
         sleep: /sleep\s*:\s*(.*)/i,
     };
-     
+    
 
  for (const [key, pattern] of Object.entries(patterns)) {
         const match = text.match(pattern);
@@ -52,7 +51,7 @@ function _parseTextToObject(text) {
             }
         } 
     }
-     
+    
     return parsedData;
 }
 
@@ -62,18 +61,18 @@ function _parseTextToObject(text) {
  * @param {string} imagePath - The full path to the image.
  * @returns {Promise<object>} - The structured survey data.
  */
-async function processImageToData(imagePath) {
+async function extractDataFromImage(imagePath) {
     console.log(`-> Starting OCR process for: ${path.basename(imagePath)}`);
     
     try {
-        const processedImageBuffer = await _preprocessForOcr(imagePath);
+        const processedImageBuffer = await _preprocessImage(imagePath);
 
         const { data: { text } } = await Tesseract.recognize(
             processedImageBuffer,
             'eng',
             { logger: m => { if(m.status === 'recognizing text') { process.stdout.write(`\r   Recognizing... ${Math.round(m.progress * 100)}%`); } } }
         );
-        process.stdout.write('\r   Recognition complete.              \n'); // Clear the line
+        process.stdout.write('\r   Recognition complete.                     \n'); // Clear the line
 
         if (!text || !text.trim()) {
             console.log("Warning: OCR did not detect any text.");
@@ -81,7 +80,7 @@ async function processImageToData(imagePath) {
         }
 
         console.log("-> OCR successful. Parsing text...");
-        const structuredData = _parseTextToObject(text);
+        const structuredData = _parseOcrText(text);
         console.log("-> Parsing complete.");
         return structuredData;
 
@@ -91,4 +90,4 @@ async function processImageToData(imagePath) {
     }
 }
 
-module.exports = { processImageToData };
+module.exports = { extractDataFromImage };

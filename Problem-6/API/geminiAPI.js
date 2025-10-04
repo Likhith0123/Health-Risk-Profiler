@@ -1,4 +1,3 @@
-
 require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') }); // Load .env file from the root
 
 const API_KEY = process.env.GOOGLE_API_KEY;
@@ -57,7 +56,7 @@ async function _callGeminiApi(systemPrompt, userInput, jsonSchema) {
 /**
  * Calls the AI to get a comprehensive summary of every factor.
  */
-async function getRiskFactors(surveyData) {
+async function identifyRiskFactors(surveyData) {
     console.log("--- [AI Client] Preparing to get lifestyle summary... ---");
 
     // --- PROMPT ---
@@ -81,7 +80,7 @@ async function getRiskFactors(surveyData) {
 }
 
 
-async function getRecommendations(riskFactors) {
+async function generatePersonalizedRecommendations(riskFactors) {
     console.log("\n--- [AI Client] Preparing to get recommendations... ---");
  const systemPrompt = "You are an expert health analyst. Your task is to analyze a user's survey responses. Based on the data, you must: " +
         "1. Determine an overall `risk_level` (categorized as 'low', 'medium', or 'high'). " +
@@ -115,7 +114,7 @@ async function getRecommendations(riskFactors) {
 }
 
 
-async function riskClassification(riskFactors) {
+async function classifyOverallRisk(riskFactors) {
     console.log("\n--- [AI Client] Preparing for risk classification... ---");
 
      const systemPrompt = "You are a health risk classification engine. Your task is to analyze a list of lifestyle factors provided by a user. Based on these factors, you must perform the following actions:" +
@@ -142,7 +141,7 @@ async function riskClassification(riskFactors) {
 
     if (responseJson) {
         console.log("--- [AI Client] Successfully received risk classification! ---");
-               return responseJson;
+              return responseJson;
     }
 
     console.log("--- [AI Client] Failed to get risk classification. ---");
@@ -150,6 +149,4 @@ async function riskClassification(riskFactors) {
 }
 
 
-module.exports = { getRiskFactors,riskClassification, getRecommendations };
-
-    
+module.exports = { identifyRiskFactors, classifyOverallRisk, generatePersonalizedRecommendations };
